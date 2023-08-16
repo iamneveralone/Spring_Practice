@@ -6,6 +6,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.*;
+
 public class SingletonTest {
 
     @Test
@@ -22,7 +24,7 @@ public class SingletonTest {
         System.out.println("memberService1 = " + memberService1);
         System.out.println("memberService2 = " + memberService2);
 
-        // 결과
+        // 출력 결과
         // memberService1 = hello.core.member.MemberServiceImpl@55fe41ea
         // memberService2 = hello.core.member.MemberServiceImpl@fbd1f6
         // -> 이렇게 되면 JVM 메모리에 계속 객체가 생성되어 올라가게 됨
@@ -30,10 +32,29 @@ public class SingletonTest {
         // memberService1 != memberService2
         // isEqualTo : 객체가 가진 값이 같은지 비교
         // isNotSameAs : 객체의 주소 값이 같은지 비교
-        Assertions.assertThat(memberService1).isNotSameAs(memberService2);
+        assertThat(memberService1).isNotSameAs(memberService2);
+    }
+    // 우리가 이전에 만들었던 스프링을 적용하지 않은 순수한 DI 컨테이너 AppConfig 는 요청이 들어올 때마다 객체를 새로 생성하는 방식
+    // -> 메모리 낭비가 심하다는 단점 존재
+    // -> 해결방안 : 해당 객체가 딱 1개만 생성되고, 그 이후에는 이 객체가 공유되도록 설계
+    // -> 싱글톤(Singleton) 패턴
+
+    @Test
+    @DisplayName("싱글톤 패턴을 적용한 객체 사용")
+    void singletonServiceTest(){
+        // getInstance() 메서드는 static 메서드이기 때문에 객체 생성 없이 사용 가능
+        SingletonService singletonService1 = SingletonService.getInstance();
+        SingletonService singletonService2 = SingletonService.getInstance();
+
+        System.out.println("singletonService1 = " + singletonService1);
+        System.out.println("singletonService2 = " + singletonService2);
+
+        // 출력 결과
+        // singletonService1 = hello.core.singleton.SingletonService@2cd76f31
+        // singletonService2 = hello.core.singleton.SingletonService@2cd76f31
+
+        assertThat(singletonService1).isSameAs(singletonService2);
     }
 }
-// 우리가 이전에 만들었던 스프링을 적용하지 않은 순수한 DI 컨테이너 AppConfig 는 요청이 들어올 때마다 객체를 새로 생성하는 방식
-// -> 메모리 낭비가 심하다는 단점 존재
-// -> 해결방안 : 해당 객체가 딱 1개만 생성되고, 그 이후에는 이 객체가 공유되도록 설계
-// -> 싱글톤(Singleton) 패턴
+// 스프링 컨테이너는 기본적으로 객체를 싱글톤으로 만들어서 객체를 관리해줌
+// -> 스프링 컨테이너는 싱글톤 패턴이 가진 단점들을 다 해결하면서 객체를 싱글톤으로 관리함
