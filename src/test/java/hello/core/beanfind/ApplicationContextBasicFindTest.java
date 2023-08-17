@@ -47,8 +47,8 @@ class ApplicationContextBasicFindTest {
     // 테스트는 항상 실패 테스트도 만들어야 함
     @Test
     @DisplayName("빈 이름으로 조회X")
-    void finBeanByNameX(){
-        MemberService xxxxx = ac.getBean("xxxxx", MemberService.class);
+    void findBeanByNameX(){
+        // MemberService xxxxx = ac.getBean("xxxxx", MemberService.class);
         // 이 예외가 터져야 테스트가 성공하는 것임
         // 오른쪽의 로직을 실행하면 왼쪽의 예외가 터져야 성공
         assertThrows(NoSuchBeanDefinitionException.class,
