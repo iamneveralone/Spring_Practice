@@ -7,7 +7,10 @@ import hello.core.discount.RateDiscountPolicy;
 import hello.core.member.Member;
 import hello.core.member.MemberRepository;
 import hello.core.member.MemoryMemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class OrderServiceImpl implements OrderService {
 
     // final 은 필드에서 초기화 or 생성자로 초기화 둘 중 하나
@@ -20,10 +23,12 @@ public class OrderServiceImpl implements OrderService {
     // OrderServiceImpl 입장에서 생성자를 통해 어떤 구현 객체가 들어올지(주입될지) 알 수 없음
     // OrderServiceImpl 의 생성자를 통해서 어떤 구현 객체를 주입할지는 오직 외부(AppConfig)에서 결정
     // OrderServiceImpl 은 이제부터 실행에만 집중하면 됨
+    @Autowired
     public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
         this.memberRepository = memberRepository;
         this.discountPolicy = discountPolicy;
     }
+    // @Autowired 사용하면 생성자에서 여러 의존 관계도 한 번에 주입 받을 수 있음
 
     @Override
     public Order createOrder(Long memberId, String itemName, int itemPrice) {
