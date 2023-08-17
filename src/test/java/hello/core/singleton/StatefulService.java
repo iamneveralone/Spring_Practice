@@ -8,14 +8,15 @@ package hello.core.singleton;
 // 스프링 빈의 필드에 공유 값을 설정하면 정말 큰 장애 발생 가능!!
 public class StatefulService {
 
-    private int price; // 상태를 유지하는 필드
+    // private int price; // 상태를 유지하는 필드
 
-    public void order(String name, int price){
+    public int order(String name, int price){
         System.out.println("name = " + name + " price = " + price);
-        this.price = price; // 여기가 문제!
+        // this.price = price; // 여기가 문제!
+        return price; // 그냥 바로 넘겨버리자
     }
 
-    public int getPrice(){
+    /*public int getPrice(){
         return price;
-    }
+    }*/
 }
