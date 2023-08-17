@@ -67,8 +67,11 @@ public class ConfigurationSingletonTest {
         // -> 내가 만든 클래스가 아니라, 스프링이 CGLIB 라는 바이트 코드 조작 라이브러리를 사용해서
         // AppConfig 클래스를 상속받은 임의의 다른 클래스(AppConfig@CGLIB)를 만들고, 그 다른 클래스를 스프링 빈으로 등록한 것!
         // 등록된 빈의 이름은 AppConfig 인데, 객체 인스턴스 타입은 AppConfig@CGLIB 인 상황
+
     }
-    // AppConfig@CGLIB 예상 코드
+
+}
+// AppConfig@CGLIB 예상 코드
     /*@Bean
     public MemberRepository memberRepository(){
         if (memberRepository 가 이미 스프링 컨테이너에 등록되어 있으면?){
@@ -80,7 +83,19 @@ public class ConfigurationSingletonTest {
         }
     }*/
 
-    // @Bean 이 붙은 메서드마다, 스프링 빈이 존재하면 존재하는 빈을 반환하고,
-    // 스프링 빈이 없으면 생성해서 스프링 빈으로 등록하고 반환하는 코드가 동적으로 만들어짐
-    // -> 덕분에 싱글톤이 보장되는 것!
-}
+// @Bean 이 붙은 메서드마다, 스프링 빈이 존재하면 존재하는 빈을 반환하고,
+// 스프링 빈이 없으면 생성해서 스프링 빈으로 등록하고 반환하는 코드가 동적으로 만들어짐
+// -> 덕분에 싱글톤이 보장되는 것!
+
+// AppConfig 에 @Configuration 붙이지 않고, 테스트 돌리면 class hello.core.AppConfig 출력됨
+// 또한,
+// call AppConfig.memberService
+// call AppConfig.memberRepository
+// call AppConfig.memberRepository
+// call AppConfig.orderService
+// call AppConfig.memberRepository
+// 이렇게 출력됨 -> MemberRepository 가 총 3번 호출됨 -> 즉, 싱글톤이 깨짐
+
+// @Bean 만 사용해도 스프링 빈으로 등록되지만, 싱글톤을 보장하지는 않음
+// -> memberRepository() 처럼 의존 관계 주입이 필요해서 직접 호출할 때, 싱글톤 보장X
+// 스프링 설정 정보에는 항상 @Configuration 사용하자
