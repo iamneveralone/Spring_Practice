@@ -31,18 +31,21 @@ public class AppConfig {
     // MemberService 역할
     @Bean
     public MemberService memberService(){
+        System.out.println("call AppConfig.memberService");
         return new MemberServiceImpl(memberRepository());
     }
 
     // MemberRepository 역할
     @Bean
     public MemberRepository memberRepository() {
+        System.out.println("call AppConfig.memberRepository");
         return new MemoryMemberRepository();
     }
 
     // OrderService 역할
     @Bean
     public OrderService orderService(){
+        System.out.println("call AppConfig.orderService");
         return new OrderServiceImpl(memberRepository(), discountPolicy());
     }
 
@@ -56,3 +59,12 @@ public class AppConfig {
     // 클라이언트 코드인 OrderServiceImpl 를 포함해서 '사용 영역'의 어떤 코드도 변경할 필요 없음
     // '구성 영역'은 당연히 변경됨
 }
+// @Bean memberService -> new MemoryMemberRepository() 실행
+// memberService 빈을 만드를 코드를 보면, memberRepository() 호출
+// -> 이 메소드 호출하면 new MemoryMemberRepository() 실행
+
+// @Bean orderService -> new MemoryMemberRepository() 실행
+// orderService 빈을 만드는 코드를 보면, memberRepository() 호출
+// -> 이 메소드 호출하면 동일하게 new MemoryMemberRepository() 실행
+
+// 결과적으로 각각 다른 2개의 MemoryMemberRepository 가 생성되면서 싱글톤 깨지는 것처럼 보임
