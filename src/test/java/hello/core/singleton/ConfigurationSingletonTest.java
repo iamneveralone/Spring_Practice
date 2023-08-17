@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -39,16 +40,47 @@ public class ConfigurationSingletonTest {
         assertThat(memberService.getMemberRepository()).isSameAs(memberRepository);
         assertThat(orderService.getMemberRepository()).isSameAs(memberRepository);
     }
-}
-// 코드 그대로만 보면 예상대로라면
-// call AppConfig.memberService
-// call AppConfig.memberRepository
-// call AppConfig.memberRepository
-// call AppConfig.orderService
-// call AppConfig.memberRepository
-// 이렇게 출력되어야 할 것 같지만,
+    // 코드 그대로만 보면 예상대로라면
+    // call AppConfig.memberService
+    // call AppConfig.memberRepository
+    // call AppConfig.memberRepository
+    // call AppConfig.orderService
+    // call AppConfig.memberRepository
+    // 이렇게 출력되어야 할 것 같지만,
 
-// call AppConfig.memberService
-// call AppConfig.memberRepository
-// call AppConfig.orderService
-// 이렇게만 출력됨
+    // call AppConfig.memberService
+    // call AppConfig.memberRepository
+    // call AppConfig.orderService
+    // 이렇게만 출력됨
+
+    @Test
+    void configurationDeep(){
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class); //AppConfig 도 스프링 빈으로 등록됨
+        AppConfig bean = ac.getBean(AppConfig.class);
+
+        System.out.println("bean = " + bean.getClass()); // AppConfig 의 class 타입 출력
+
+        // 출력 결과
+        // bean = class hello.core.AppConfig$$EnhancerBySpringCGLIB$$68989ba6
+
+        // 순수한 클래스라면 class hello.core.AppConfig 이 출력되어야 하는데, 뒤에 이상한 내용이 붙어 있음
+        // -> 내가 만든 클래스가 아니라, 스프링이 CGLIB 라는 바이트 코드 조작 라이브러리를 사용해서
+        // AppConfig 클래스를 상속받은 임의의 다른 클래스(AppConfig@CGLIB)를 만들고, 그 다른 클래스를 스프링 빈으로 등록한 것!
+        // 등록된 빈의 이름은 AppConfig 인데, 객체 인스턴스 타입은 AppConfig@CGLIB 인 상황
+    }
+    // AppConfig@CGLIB 예상 코드
+    /*@Bean
+    public MemberRepository memberRepository(){
+        if (memberRepository 가 이미 스프링 컨테이너에 등록되어 있으면?){
+            return 스프링 컨테이너에서 찾아서 반환;
+        }
+        else{ // 스프링 컨테이너에 없으면
+            기존 로직을 호출해서 MemberRepository 를 생성하고, 스프링 컨테이너에 등록
+            return 반환;
+        }
+    }*/
+
+    // @Bean 이 붙은 메서드마다, 스프링 빈이 존재하면 존재하는 빈을 반환하고,
+    // 스프링 빈이 없으면 생성해서 스프링 빈으로 등록하고 반환하는 코드가 동적으로 만들어짐
+    // -> 덕분에 싱글톤이 보장되는 것!
+}
