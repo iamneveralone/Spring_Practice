@@ -27,3 +27,19 @@ public class AutoAppConfig {
 // 그러면 AutoAppConfig 는 언제 스프링 빈으로 등록되는가?
 // -> new AnnotationConfigApplicationContext(AutoAppConfig.class);
 // -> 스프링 컨테이너를 생성할 때 넘겨준 클래스 정보는 스프링 빈으로 등록됨
+
+// 스프링은 컴포넌트 스캔 시 기본으로 싱글톤으로 빈을 등록함
+
+// @ComponentScan 의 basePackages 옵션 : 탐색할 패키지의 시작 위치 지정
+// -> 이 패키지를 포함해서 하위 패키지를 모두 탐색
+// basePackages = {"hello.core", "hello.service"} 이렇게 여러 시작 위치 지정 가능
+// basePackageClasses 옵션 : 지정한 클래스의 패키지를 탐색 시작 위치로 지정
+
+// 만약 아무것도 지정X : @ComponentScan 이 붙은 설정 정보 클래스의 패키지가 시작 위치로 지정됨
+
+// 권장 방법 : 패키지 위치 지정하지 않고, 설정 정보 클래스 위치를 프로젝트 최상단에 두기
+// -> 최상단 패키지를 포함한 하위 패키지는 모두 자동으로 컴포넌트 스캔의 대상이 됨
+// -> 또한, 프로젝트 메인 설정 정보는 프로젝트를 대표하는 정보이므로 프로젝트 시작 루트 위치에 두는 것이 좋다고 생각
+
+// 참고로, 스프링 부트를 사용하면 스프링 부트의 대표 시작 정보인 @SpringBootApplication 를 프로젝트 시작 루트 위치에 두는 것이 관례
+// @SpringBootApplication 는 @ComponentScan 을 포함하고 있음
