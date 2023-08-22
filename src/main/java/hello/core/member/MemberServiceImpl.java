@@ -15,6 +15,7 @@ public class MemberServiceImpl implements MemberService{
     // MemberServiceImpl 은 이제부터 "의존 관계에 대한 고민"은 외부에 맡기고, "실행에만 집중"하면 됨
     @Autowired
     public MemberServiceImpl(MemberRepository memberRepository){
+        System.out.println("memberRepository = " + memberRepository);
         this.memberRepository = memberRepository;
     }
 
