@@ -9,6 +9,7 @@ import hello.core.member.MemberRepository;
 import hello.core.member.MemoryMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     // OrderServiceImpl 의 생성자를 통해서 어떤 구현 객체를 주입할지는 오직 외부(AppConfig)에서 결정
     // OrderServiceImpl 은 이제부터 실행에만 집중하면 됨
     @Autowired
-    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+    public OrderServiceImpl(MemberRepository memberRepository, @Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy) {
         this.memberRepository = memberRepository;
         this.discountPolicy = discountPolicy;
     }
@@ -60,3 +61,7 @@ public class OrderServiceImpl implements OrderService {
 
 // 최근에는 생성자를 딱 1개 두고, @Autowired 를 생략하는 방법을 주로 사용
 // 여기에 Lombok 라이브러리의 @RequiredArgsConstructor 함께 사용하면 기능은 다 제공하면서, 코드 깔끔하게 사용 가능
+
+// @Qualifier : 추가 구분자를 붙여주는 방법 (추가적인 방법을 제공하는 것일뿐, 빈 이름을 변경하는 건 아님)
+// @Qualifier 로 주입할 때, @Qualifier("mainDiscountPolicy")를 못 찾으면 mainDiscountPolicy 라는 이름의 스프링 빈을 추가로 찾음
+// -> But, 경험상 @Qualifier 는 @Qualifier 를 찾는 용도로만 사용하는 것이 명확하고 좋음
