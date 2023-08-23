@@ -17,16 +17,27 @@ public class OrderServiceImpl implements OrderService {
     // 이 경우는 생성자로 초기화
     // 인터페이스만 존재 (추상화에만 의존), 구현체에 의존X -> DIP 지키고 있음
     // discountPolicy 는 FixDiscountPolicy 가 들어올지 RateDiscountPolicy 가 들어올지 모름
-    private final MemberRepository memberRepository;
-    private final DiscountPolicy discountPolicy;
+    private MemberRepository memberRepository;
+    private DiscountPolicy discountPolicy;
+
+    @Autowired // 주입할 대상이 없어도 동작하게 하려면 required = false 옵션 작성
+    public void setMemberRepository(MemberRepository memberRepository) {
+        System.out.println("memberRepository = " + memberRepository);
+        this.memberRepository = memberRepository;
+    }
+
+    @Autowired
+    public void setDiscountPolicy(DiscountPolicy discountPolicy) {
+        System.out.println("discountPolicy = " + discountPolicy);
+        this.discountPolicy = discountPolicy;
+    }
+    // @Autowired 통해 수정자(setter) 주입하면 생성자는 필요X
 
     // OrderServiceImpl 입장에서 생성자를 통해 어떤 구현 객체가 들어올지(주입될지) 알 수 없음
     // OrderServiceImpl 의 생성자를 통해서 어떤 구현 객체를 주입할지는 오직 외부(AppConfig)에서 결정
     // OrderServiceImpl 은 이제부터 실행에만 집중하면 됨
     @Autowired
     public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
-        System.out.println("memberRepository = " + memberRepository);
-        System.out.println("discountPolicy = " + discountPolicy);
         this.memberRepository = memberRepository;
         this.discountPolicy = discountPolicy;
     }
