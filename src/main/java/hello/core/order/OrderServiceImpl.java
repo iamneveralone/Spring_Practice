@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     // OrderServiceImpl 의 생성자를 통해서 어떤 구현 객체를 주입할지는 오직 외부(AppConfig)에서 결정
     // OrderServiceImpl 은 이제부터 실행에만 집중하면 됨
     @Autowired
-    public OrderServiceImpl(MemberRepository memberRepository, @Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy) {
+    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
         this.memberRepository = memberRepository;
         this.discountPolicy = discountPolicy;
     }
@@ -45,6 +45,10 @@ public class OrderServiceImpl implements OrderService {
     // 테스트 용도
     public MemberRepository getMemberRepository() {
         return memberRepository;
+    }
+
+    public DiscountPolicy getDiscountPolicy() {
+        return discountPolicy;
     }
 }
 
@@ -65,3 +69,12 @@ public class OrderServiceImpl implements OrderService {
 // @Qualifier : 추가 구분자를 붙여주는 방법 (추가적인 방법을 제공하는 것일뿐, 빈 이름을 변경하는 건 아님)
 // @Qualifier 로 주입할 때, @Qualifier("mainDiscountPolicy")를 못 찾으면 mainDiscountPolicy 라는 이름의 스프링 빈을 추가로 찾음
 // -> But, 경험상 @Qualifier 는 @Qualifier 를 찾는 용도로만 사용하는 것이 명확하고 좋음
+
+// @Qualifier 의 단점 : 모든 코드에 @Qualifier 를 붙여줘야 한다는 점
+// @Primary : 우선 순위를 정하는 방법 (@Autowired 시에 여러 빈이 매칭되면 @Primary 가 우선권을 가짐)
+// -> @Primary 를 사용하면 @Qualifier 붙일 필요X
+
+// "우선 순위"
+// @Primary 는 기본 값처럼 동작하는 것, @Qualifier 는 매우 상세하게 동작
+// 스프링은 자동보다는 수동이, 넓은 범위의 선택권보다는 좁은 범위의 선택권이 우선 순위가 높음
+// -> @Primary 와 @Qualifier 중에서는 @Qualifier 가 우선순위가 높음

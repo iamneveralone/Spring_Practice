@@ -1,6 +1,7 @@
 package hello.core.scan;
 
 import hello.core.AutoAppConfig;
+import hello.core.discount.DiscountPolicy;
 import hello.core.member.MemberRepository;
 import hello.core.member.MemberService;
 import hello.core.member.MemberServiceImpl;
@@ -23,6 +24,9 @@ public class AutoAppConfigTest {
         OrderServiceImpl bean = ac.getBean(OrderServiceImpl.class);
         MemberRepository memberRepository = bean.getMemberRepository();
         System.out.println("memberRepository = " + memberRepository);
+
+        DiscountPolicy discountPolicy = bean.getDiscountPolicy();
+        System.out.println("discountPolicy = " + discountPolicy);
     }
     // AnnotationConfigApplicationContext 를 사용하는 것은 기존과 동일
     // 설정 정보로 AutoAppConfig 클래스를 넘겨줌
