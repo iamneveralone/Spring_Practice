@@ -17,8 +17,14 @@ public class OrderServiceImpl implements OrderService {
     // 이 경우는 생성자로 초기화
     // 인터페이스만 존재 (추상화에만 의존), 구현체에 의존X -> DIP 지키고 있음
     // discountPolicy 는 FixDiscountPolicy 가 들어올지 RateDiscountPolicy 가 들어올지 모름
-    @Autowired private MemberRepository memberRepository;
-    @Autowired private DiscountPolicy discountPolicy;
+    private MemberRepository memberRepository;
+    private DiscountPolicy discountPolicy;
+
+    @Autowired
+    public void init(MemberRepository memberRepository, DiscountPolicy discountPolicy){
+        this.memberRepository = memberRepository;
+        this.discountPolicy = discountPolicy;
+    }
 
     // OrderServiceImpl 입장에서 생성자를 통해 어떤 구현 객체가 들어올지(주입될지) 알 수 없음
     // OrderServiceImpl 의 생성자를 통해서 어떤 구현 객체를 주입할지는 오직 외부(AppConfig)에서 결정
