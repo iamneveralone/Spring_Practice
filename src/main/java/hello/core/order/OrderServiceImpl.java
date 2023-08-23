@@ -7,10 +7,12 @@ import hello.core.discount.RateDiscountPolicy;
 import hello.core.member.Member;
 import hello.core.member.MemberRepository;
 import hello.core.member.MemoryMemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     // final 은 필드에서 초기화 or 생성자로 초기화 둘 중 하나
@@ -23,11 +25,11 @@ public class OrderServiceImpl implements OrderService {
     // OrderServiceImpl 입장에서 생성자를 통해 어떤 구현 객체가 들어올지(주입될지) 알 수 없음
     // OrderServiceImpl 의 생성자를 통해서 어떤 구현 객체를 주입할지는 오직 외부(AppConfig)에서 결정
     // OrderServiceImpl 은 이제부터 실행에만 집중하면 됨
-    @Autowired
+    /*@Autowired
     public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
         this.memberRepository = memberRepository;
         this.discountPolicy = discountPolicy;
-    }
+    }*/
     // @Autowired 사용하면 생성자에서 여러 의존 관계도 한 번에 주입 받을 수 있음
     // 생성자가 딱 1개면 @Autowired 생략 가능
     // 그러나, 파라미터 없는 기본 생성자와 같은 다른 생성자가 존재하면 사용하려는 특정 생성자에 @Autowired 붙여줘야 함
@@ -45,3 +47,17 @@ public class OrderServiceImpl implements OrderService {
         return memberRepository;
     }
 }
+
+// @RequiredArgsConstructor : Lombok 이 제공하는 어노테이션
+// -> final 키워드가 붙음으로써 필수값이 된 필드를 모아서 생성자를 자동으로 만들어주는 역할
+// -> Lombok 이 자바의 '애노테이션 프로세서'라는 기능을 이용해서 컴파일 시점에 생성자 코드를 자동으로 생성해줌
+// 즉, 기존에 작성해주었던 아래의 생성자를 만들어주는 것임 (이제는 코드에서 보이진 않지만, 실제 호출 가능)
+
+// @Autowired
+// public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+//     this.memberRepository = memberRepository;
+//     this.discountPolicy = discountPolicy;
+// }
+
+// 최근에는 생성자를 딱 1개 두고, @Autowired 를 생략하는 방법을 주로 사용
+// 여기에 Lombok 라이브러리의 @RequiredArgsConstructor 함께 사용하면 기능은 다 제공하면서, 코드 깔끔하게 사용 가능
