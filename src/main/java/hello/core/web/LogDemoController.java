@@ -14,15 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 public class LogDemoController {
 
     private final LogDemoService logDemoService;
-    private final ObjectProvider<MyLogger> myLoggerProvider;
-    // MyLogger 를 주입 받는 것이 아니라 MyLogger 를 찾을 수 있는(Dependency Lookup) 것이 주입됨
+    private final MyLogger myLogger;
 
     @RequestMapping("log-demo")
     @ResponseBody
     public String logDemo(HttpServletRequest request) throws InterruptedException {
         String requestURL = request.getRequestURL().toString();
-        // getObject() 를 최초로 하는 시점에 MyLogger 빈이 스프링 컨테이너에 생성되고, 그 빈을 가져오는 것임
-        MyLogger myLogger = myLoggerProvider.getObject();
+
+        System.out.println("myLogger = " + myLogger.getClass());
+
         myLogger.setRequestURL(requestURL);
 
         myLogger.log("controller test");
@@ -54,3 +54,20 @@ public class LogDemoController {
 // ObjectProvider 덕분에 ObjectProvider.getObject()를 호출하는 시점까지 "request scope 빈의 생성을 지연"할 수 있음
 // ObjectProvider.getObject()를 호출하는 시점에는 HTTP 요청이 진행 중이므로 request scope 빈의 생성이 정상적으로 처리됨
 // ObjectProvider.getObject()를 LogDemoController, LogDemoService 에서 각각 한 번씩 따로 호출해도 같은 HTTP 요청이면 같은 스프링 빈이 반환됨!
+
+// "MyLogger 클래스의 @Scope 에 proxyMode 옵션 사용"
+// System.out.println("myLogger = " + myLogger.getClass());
+// 출력 결과
+// myLogger = class hello.core.common.MyLogger$$EnhancerBySpringCGLIB$$65ad052e
+// -> 스프링에 의해 뭔가 조작된 것을 볼 수 있음
+// 처음에는 껍데기뿐인 가짜 MyLogger 를 넣어두고, myLogger 의 기능을 실제 호출하는 시점에 진짜를 찾아서 동작함
+
+// "동작 정리"
+// CGLIB 라는 라이브러리로 내 클래스를 상속받은 가짜 프록시 객체를 만들어서 주입
+// 이 가짜 프록시 객체는 실제 요청이 오면 그 때 내부에서 실제 빈을 요청하는 위임 로직이 들어있음 (없으면 빈 생성한 후 요청)
+// 가짜 프록시 객체는 실제 request scope 와는 관계 없음. 그냥 가짜이고, 내부에 단순한 위임 로직만 있고, 싱글톤처럼 동작함
+
+// "특징 정리"
+// 프록시 객체 덕분에 클라이언트는 마치 싱글톤 빈을 사용하듯이 편리하게 request scope 를 사용할 수 있음
+// 사실 Provider 를 사용하든, 프록시를 사용하든 핵심 아이디어는 진짜 객체 조회를 꼭 필요한 시점까지 미룰 수 있다는 점!!
+// 꼭 웹 스코프가 아니어도 프록시는 사용 가능

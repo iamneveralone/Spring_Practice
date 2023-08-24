@@ -1,6 +1,7 @@
 package hello.core.common;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -8,7 +9,7 @@ import javax.annotation.PreDestroy;
 import java.util.UUID;
 
 @Component
-@Scope(value = "request")
+@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class MyLogger {
 
     private String uuid;
@@ -42,3 +43,9 @@ public class MyLogger {
 // 이 빈은 HTTP 요청 당 하나씩 생성되므로, uuid 를 저장해두면 다른 HTTP 요청과 구분 가능
 // 이 빈이 소멸되는 시점에 @PreDestroy 사용해서 종료 메세지 남김
 // requestURL 은 이 빈이 생성되는 시점에는 알 수 없으므로, 외부에서 setter 로 입력받음
+
+// @Scope 옵션에 proxyMode = ScopedProxyMode.TARGET_CLASS 추가
+// -> 적용 대상이 인터페이스가 아닌 클래스면 TARGET_CLASS 선택
+// -> 적용 대상이 인터페이스면 INTERFACES 선택
+// 이렇게 하면 MyLogger 의 가짜 프록시 클래스를 만들어두고,
+// HTTP request 와 상관 없이 가짜 프록시 클래스를 다른 빈에 미리 주입해둘 수 있음
