@@ -1,13 +1,14 @@
 package hello.core.lifecycle;
 
-public class NetworkClient {
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+
+public class NetworkClient implements InitializingBean, DisposableBean {
 
     private String url;
 
     public NetworkClient(){
         System.out.println("생성자 호출 url = " + url);
-        connect();
-        call("초기화 연결 메시지");
     }
 
     public void setUrl(String url) {
@@ -26,6 +27,19 @@ public class NetworkClient {
     // 서비스 종료시 호출
     public void disconnect(){
         System.out.println("close: " + url);
+    }
+
+    @Override // afterPropertiesSet : 의존관계 주입 끝나면 호출해주겠다는 의미
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("NetworkClient.afterPropertiesSet");
+        connect();
+        call("초기화 연결 메시지");
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("NetworkClient.destroy");
+        disconnect();
     }
 }
 // 생성자 부분을 보면 url 정보 없이 connect 가 호출되는 것을 확인할 수 있음
