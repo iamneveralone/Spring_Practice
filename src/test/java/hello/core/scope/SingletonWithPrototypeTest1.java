@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Provider;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -38,7 +39,7 @@ public class SingletonWithPrototypeTest1 {
 
         ClientBean clientBean2 = ac.getBean(ClientBean.class);
         int count2 = clientBean2.logic();
-        assertThat(count2).isEqualTo(2);
+        assertThat(count2).isEqualTo(1);
     }
 
     @Scope("singleton") // 싱글톤 빈은 굳이 애노테이션 안 적어줘도 됨
@@ -51,10 +52,10 @@ public class SingletonWithPrototypeTest1 {
         }*/
 
         @Autowired
-        private ObjectProvider<PrototypeBean> prototypeBeanProvider; // 테스트여서 간단하게 필드 주입으로 구현한 것
+        private Provider<PrototypeBean> prototypeBeanProvider; // 테스트여서 간단하게 필드 주입으로 구현한 것
 
         public int logic(){
-            PrototypeBean prototypeBean = prototypeBeanProvider.getObject();
+            PrototypeBean prototypeBean = prototypeBeanProvider.get();
             prototypeBean.addCount();
             int count = prototypeBean.count;
             return count;
@@ -67,7 +68,8 @@ public class SingletonWithPrototypeTest1 {
     // ObjectProvider 의 getObject()를 호출하면 내부에서는 스프링 컨테어너를 통해 해당 빈을 찾아서 반환 (DL)
     // -> 즉, 호출할 때마다 계속 새로운 PrototypeBean 이 생성되는 것
     // 스프링이 제공하는 기능을 사용하지만, 기능이 단순하므로 단위 테스트를 만들거나 mock 코드를 만들기는 훨씬 쉬워짐
-    // ObjectProvider 은 지금 막 필요한 DL 정도의 기능만 제공!
+
+    // Provider 는 지금 막 필요한 DL 정도의 기능만 제공!
 
 
     @Scope("prototype")
