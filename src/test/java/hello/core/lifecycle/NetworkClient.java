@@ -1,9 +1,6 @@
 package hello.core.lifecycle;
 
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-
-public class NetworkClient implements InitializingBean, DisposableBean {
+public class NetworkClient {
 
     private String url;
 
@@ -29,16 +26,14 @@ public class NetworkClient implements InitializingBean, DisposableBean {
         System.out.println("close: " + url);
     }
 
-    @Override // afterPropertiesSet : 의존관계 주입 끝나면 호출해주겠다는 의미
-    public void afterPropertiesSet() throws Exception {
-        System.out.println("NetworkClient.afterPropertiesSet");
+    public void init() {
+        System.out.println("NetworkClient.init");
         connect();
         call("초기화 연결 메시지");
     }
 
-    @Override
-    public void destroy() throws Exception {
-        System.out.println("NetworkClient.destroy");
+    public void close() {
+        System.out.println("NetworkClient.close");
         disconnect();
     }
 }
@@ -60,6 +55,7 @@ public class NetworkClient implements InitializingBean, DisposableBean {
 
 // "스프링 빈의 이벤트 라이프 사이클" (싱글톤인 경우의 예시)
 // 스프링 컨테이너 생성 -> 스프링 빈 생성 -> 의존관계 주입 -> 초기화 콜백 -> 사용 -> 소멸전 콜백 -> 스프링 종료
+// 이 예시에서는 '의존관계 주입'보다는 '값 주입'에 조금 더 가까움
 
 // (참고) "객체의 생성과 초기화를 분리하자"
 // 생성자 : 필수 정보(파라미터)를 받고, 메모리 할당해서 객체 생성하는 책임
