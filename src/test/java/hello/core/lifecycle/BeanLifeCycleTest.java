@@ -13,7 +13,7 @@ public class BeanLifeCycleTest {
     public void lifeCycleTest(){
         ConfigurableApplicationContext ac = new AnnotationConfigApplicationContext(LifeCycleConfig.class);
         NetworkClient client = ac.getBean(NetworkClient.class);
-        ac.close();
+        ac.close(); // close 를 해줄 때 소멸 콜백 발생
         // 기존에는 ApplicationContext 를 close 할 일이 없었는데, close 를 사용할 경우에는
         // ApplicationContext 대신 ConfigurableApplicationContext 또는 AnnotationConfigApplicationContext 사용!
         // ConfigurableApplicationContext 가 AnnotationConfigApplicationContext 상위 클래스! (부모는 자식을 담을 수 있음)
@@ -22,7 +22,7 @@ public class BeanLifeCycleTest {
 
     @Configuration
     static class LifeCycleConfig{
-        @Bean(initMethod = "init", destroyMethod = "close")
+        @Bean
         public NetworkClient networkClient(){
             NetworkClient networkClient = new NetworkClient();
             networkClient.setUrl("http://hello-spring.dev");
@@ -40,3 +40,10 @@ public class BeanLifeCycleTest {
 // 1. 메서드 이름을 자유롭게 줄 수 있음 (init, close 말고 다른 이름도 가능)
 // 2. 스프링 빈이 스프링 코드에 의존하지 않음 (NetworkClient 클래스만 보면 스프링을 사용하는 코드 아무것도 없음)
 // 3. 코드가 아니라 설정 정보를 사용하기 때문에 코드를 고칠 수 없는 외부 라이브러리에도 초기화, 종료 메서드 적용 가능
+
+// @PostConstruct, @PreDestroy 애노테이션 특징
+// 1. 최신 스프링에서 권장하는 방법
+// 2. 애노테이션 하나만 붙이면 되기 때문에 매우 편리함
+// 3. 컴포넌트 스캔과 잘 어울림
+// 4. 유일한 단점 : 외부 라이브러리에 적용하지 못함
+// -> 어쨌든 결론은 웬만하면 @PostConstruct, @PreDestroy 사용하자!
