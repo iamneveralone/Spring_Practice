@@ -2,6 +2,7 @@ package hello.core.scope;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -42,19 +43,32 @@ public class SingletonWithPrototypeTest1 {
 
     @Scope("singleton") // 싱글톤 빈은 굳이 애노테이션 안 적어줘도 됨
     static class ClientBean{
-        private final PrototypeBean prototypeBean; // 생성 시점에 주입
+        // private final PrototypeBean prototypeBean; // 생성 시점에 주입
 
-        @Autowired
+        /*@Autowired
         public ClientBean(PrototypeBean prototypeBean) {
             this.prototypeBean = prototypeBean;
-        }
+        }*/
+
+        @Autowired
+        private ObjectProvider<PrototypeBean> prototypeBeanProvider; // 테스트여서 간단하게 필드 주입으로 구현한 것
 
         public int logic(){
+            PrototypeBean prototypeBean = prototypeBeanProvider.getObject();
             prototypeBean.addCount();
             int count = prototypeBean.count;
             return count;
         }
     }
+    // ObjectProvider : 지정한 빈을 스프링 컨테이너에서 대신 찾아주는 DL(Dependency Lookup) 서비스 제공
+    // (과거에는 ObjectFactory 가 있었는데, 여기에 편의 기능을 더 추가한 것이 ObjectProvider)
+
+    // 실행해보면 prototypeBeanProvider.getObject()를 통해서 항상 새로운 프로토타입 빈이 생성되는 것을 확인할 수 있음
+    // ObjectProvider 의 getObject()를 호출하면 내부에서는 스프링 컨테어너를 통해 해당 빈을 찾아서 반환 (DL)
+    // -> 즉, 호출할 때마다 계속 새로운 PrototypeBean 이 생성되는 것
+    // 스프링이 제공하는 기능을 사용하지만, 기능이 단순하므로 단위 테스트를 만들거나 mock 코드를 만들기는 훨씬 쉬워짐
+    // ObjectProvider 은 지금 막 필요한 DL 정도의 기능만 제공!
+
 
     @Scope("prototype")
     static class PrototypeBean{
