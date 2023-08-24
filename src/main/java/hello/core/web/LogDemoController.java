@@ -2,6 +2,7 @@ package hello.core.web;
 
 import hello.core.common.MyLogger;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,15 +14,19 @@ import javax.servlet.http.HttpServletRequest;
 public class LogDemoController {
 
     private final LogDemoService logDemoService;
-    private final MyLogger myLogger;
+    private final ObjectProvider<MyLogger> myLoggerProvider;
+    // MyLogger 를 주입 받는 것이 아니라 MyLogger 를 찾을 수 있는(Dependency Lookup) 것이 주입됨
 
     @RequestMapping("log-demo")
     @ResponseBody
-    public String logDemo(HttpServletRequest request){
+    public String logDemo(HttpServletRequest request) throws InterruptedException {
         String requestURL = request.getRequestURL().toString();
+        // getObject() 를 최초로 하는 시점에 MyLogger 빈이 스프링 컨테이너에 생성되고, 그 빈을 가져오는 것임
+        MyLogger myLogger = myLoggerProvider.getObject();
         myLogger.setRequestURL(requestURL);
 
         myLogger.log("controller test");
+        Thread.sleep(1000);
         logDemoService.logic("testId");
         return "OK";
     }
@@ -44,4 +49,8 @@ public class LogDemoController {
 //    request 스코프 빈은 아직 생성되지 않음 (이 빈은 실제 고객의 요청이 와야 생성 가능하기 때문!)
 
 // -> 결국, 스프링 컨테이너에게 이 스프링 빈을 달라고 하는 단계를 의존관계 주입 단계가 아니라, 실제 고객 요청이 왔을 때로 미루어야 함
-// -> 앞에서 배운 Provider 사용하자!
+// -> 앞에서 배운 ObjectProvider 사용하자!
+
+// ObjectProvider 덕분에 ObjectProvider.getObject()를 호출하는 시점까지 "request scope 빈의 생성을 지연"할 수 있음
+// ObjectProvider.getObject()를 호출하는 시점에는 HTTP 요청이 진행 중이므로 request scope 빈의 생성이 정상적으로 처리됨
+// ObjectProvider.getObject()를 LogDemoController, LogDemoService 에서 각각 한 번씩 따로 호출해도 같은 HTTP 요청이면 같은 스프링 빈이 반환됨!
